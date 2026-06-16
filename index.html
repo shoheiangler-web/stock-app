@@ -199,11 +199,11 @@
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>逆指値（円）← 買値×0.97</label>
+        <label>逆指値（円）← 買値×0.98</label>
         <input id="f-stop" type="number" placeholder="自動計算">
       </div>
       <div class="form-group">
-        <label>利確価格（円）← 買値×1.15</label>
+        <label>利確価格（円）← 買値×1.20</label>
         <input id="f-tp" type="number" placeholder="自動計算">
       </div>
     </div>
@@ -228,7 +228,7 @@
       <select id="s-reason">
         <option value="利確">利確（+15%）</option>
         <option value="損切り">損切り（-3%）</option>
-        <option value="期間満了">期間満了（15営業日）</option>
+        <option value="期間満了">期間満了（20営業日）</option>
         <option value="手動">手動決済</option>
       </select>
     </div>
@@ -341,16 +341,18 @@ function fmtY(n) { return '¥'+Math.round(n).toLocaleString('ja-JP'); }
 // ===== スクロール（ホイール）で数値増減 =====
 function addWheelToInputs() {
   document.querySelectorAll('input[type=number]').forEach(el => {
-    el.removeEventListener('wheel', wheelHandler);
-    el.addEventListener('wheel', wheelHandler, {passive:false});
+    if (el.dataset.wheelAdded) return;
+    el.dataset.wheelAdded = '1';
+    el.addEventListener('wheel', function(e) {
+      e.preventDefault();
+      const step = parseFloat(this.step) || 1;
+      const val = parseFloat(this.value) || 0;
+      this.value = e.deltaY < 0 ? val + step : Math.max(0, val - step);
+      // モーダル内input（id付き）はinputイベント、テーブル内はchangeイベント
+      const evt = this.closest('.modal') ? 'input' : 'change';
+      this.dispatchEvent(new Event(evt, {bubbles:true}));
+    }, {passive:false});
   });
-}
-function wheelHandler(e) {
-  e.preventDefault();
-  const step = parseFloat(this.step) || 1;
-  const val = parseFloat(this.value) || 0;
-  this.value = e.deltaY < 0 ? val + step : Math.max(0, val - step);
-  this.dispatchEvent(new Event('input'));
 }
 
 // ===== ページ切り替え =====
@@ -383,16 +385,15 @@ function renderPositions() {
     const cost = p.buyPrice * p.qty;
     totalCost += cost;
     const elapsed = countBusinessDaysElapsed(p.date);
-    const remaining = 15 - elapsed;
+    const remaining = 20 - elapsed;
     let badgeClass = remaining <= 3 ? 'urgent' : remaining <= 7 ? 'warning' : 'ok';
-    const deadlineStr = addBusinessDays(p.date, 15).toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'});
+    const deadlineStr = addBusinessDays(p.date, 20).toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'});
 
     return `<tr>
       <td><div class="ticker">${p.code}<span>${p.name||''}</span></div></td>
       <td>
         <input class="inline-input" type="number" value="${p.buyPrice}" step="1"
-          onchange="updateField(${i},'buyPrice',this.value)"
-          oninput="updateField(${i},'buyPrice',this.value)">
+          onchange="updateField(${i},'buyPrice',this.value)">
       </td>
       <td>${p.qty}株</td>
       <td style="font-size:12px;color:#64748b">
@@ -422,8 +423,8 @@ function updateField(idx, field, val) {
     positions[idx][field] = v;
     // 買値変更時に逆指値・利確も再計算
     if (field === 'buyPrice') {
-      positions[idx].stopLoss = Math.floor(v * 0.97);
-      positions[idx].takeProfit = Math.ceil(v * 1.15);
+      positions[idx].stopLoss = Math.floor(v * 0.98);
+      positions[idx].takeProfit = Math.ceil(v * 1.20);
     }
     save(STORE_POS, positions);
     renderPositions();
@@ -479,8 +480,8 @@ function closeAddModal() {
 function onBuyInput() {
   const v = parseFloat(document.getElementById('f-buy').value);
   if (v) {
-    document.getElementById('f-stop').value = Math.floor(v * 0.97);
-    document.getElementById('f-tp').value = Math.ceil(v * 1.15);
+    document.getElementById('f-stop').value = Math.floor(v * 0.98);
+    document.getElementById('f-tp').value = Math.ceil(v * 1.20);
   }
 }
 
