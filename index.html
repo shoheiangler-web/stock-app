@@ -498,17 +498,21 @@ function closeAddModal() {
   ['f-code','f-name','f-buy','f-actual','f-qty','f-stop','f-tp'].forEach(id => document.getElementById(id).value='');
 }
 function onBuyInput() {
-  // 逆指値・利確は実施単価を優先、なければ予定単価で計算
-  const planned = parseFloat(document.getElementById('f-buy').value);
-  const actual  = parseFloat(document.getElementById('f-actual').value);
-  const base = actual || planned;
-  if (base) {
-    document.getElementById('f-stop').value = Math.floor(base * 0.98);
-    document.getElementById('f-tp').value   = Math.ceil(base * 1.20);
-  }
+  // 予定入力時は逆指値・利確を計算しない（実施入力後に計算）
 }
 document.addEventListener('input', e => {
-  if (e.target.id === 'f-actual') onBuyInput();
+  if (e.target.id === 'f-actual') {
+    // 実施単価が入力されたら逆指値・利確を自動計算
+    const actual = parseFloat(document.getElementById('f-actual').value);
+    if (actual) {
+      document.getElementById('f-stop').value = Math.floor(actual * 0.98);
+      document.getElementById('f-tp').value   = Math.ceil(actual * 1.20);
+    } else {
+      // 実施を消したらクリア
+      document.getElementById('f-stop').value = '';
+      document.getElementById('f-tp').value   = '';
+    }
+  }
 });
 
 // サジェスト外クリックで閉じる
