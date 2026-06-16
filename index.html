@@ -233,8 +233,8 @@
     <div class="form-group">
       <label>決済理由</label>
       <select id="s-reason">
-        <option value="利確">利確（+15%）</option>
-        <option value="損切り">損切り（-3%）</option>
+        <option value="利確">利確（+20%）</option>
+        <option value="損切り">損切り（-2%）</option>
         <option value="期間満了">期間満了（20営業日）</option>
         <option value="手動">手動決済</option>
       </select>
@@ -321,19 +321,30 @@ const HOLIDAYS = new Set([
   '2026-10-12','2026-11-03','2026-11-23','2026-12-23',
 ]);
 
+// dateStr "YYYY-MM-DD" をローカル日付として扱う（タイムゾーンズレ防止）
+function parseLocalDate(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+function toDateStr(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${dd}`;
+}
 function isBusinessDay(d) {
   const day = d.getDay();
   if (day === 0 || day === 6) return false;
-  return !HOLIDAYS.has(d.toISOString().slice(0,10));
+  return !HOLIDAYS.has(toDateStr(d));
 }
 function addBusinessDays(dateStr, n) {
-  let d = new Date(dateStr);
+  let d = parseLocalDate(dateStr);
   let count = 0;
   while (count < n) { d.setDate(d.getDate()+1); if (isBusinessDay(d)) count++; }
   return d;
 }
 function countBusinessDaysElapsed(fromStr) {
-  let d = new Date(fromStr);
+  let d = parseLocalDate(fromStr);
   const today = new Date(); today.setHours(0,0,0,0);
   let count = 0;
   d.setDate(d.getDate()+1);
@@ -532,13 +543,15 @@ let settleIdx = null;
 function openSettleModal(idx) {
   settleIdx = idx;
   const p = load(STORE_POS)[idx];
+  const basePrice = p.actualPrice ?? p.buyPrice;
   document.getElementById('settle-info').innerHTML = `
     <div class="row"><span>銘柄</span><span>${p.code} ${p.name||''}</span></div>
     <div class="row"><span>株数</span><span>${p.qty}株</span></div>
-    <div class="row"><span>買値</span><span>${p.buyPrice.toLocaleString()}円</span></div>
-    <div class="row"><span>買い付け金額</span><span>${fmtY(p.buyPrice*p.qty)}</span></div>
+    <div class="row"><span>単価（予定）</span><span>${p.buyPrice.toLocaleString()}円</span></div>
+    <div class="row"><span>単価（実施）</span><span>${p.actualPrice != null ? p.actualPrice.toLocaleString()+'円' : '未入力'}</span></div>
+    <div class="row"><span>買い付け金額</span><span>${fmtY(basePrice * p.qty)}</span></div>
   `;
-  document.getElementById('s-price').value = p.buyPrice;
+  document.getElementById('s-price').value = '';
   document.getElementById('settle-modal').classList.add('open');
   setTimeout(addWheelToInputs, 50);
 }
@@ -551,10 +564,13 @@ function confirmSettle() {
 
   const positions = load(STORE_POS);
   const p = positions[settleIdx];
-  const pnl = Math.round((price - p.buyPrice) * p.qty);
+  const basePrice = p.actualPrice ?? p.buyPrice;
+  const pnl = Math.round((price - basePrice) * p.qty);
+  const today = new Date();
+  const sellDate = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
 
   const history = load(STORE_HIST);
-  history.unshift({ code:p.code, name:p.name, qty:p.qty, buyPrice:p.buyPrice, sellPrice:price, pnl, reason, buyDate:p.date, sellDate:new Date().toISOString().slice(0,10) });
+  history.unshift({ code:p.code, name:p.name, qty:p.qty, buyPrice:p.buyPrice, actualPrice:p.actualPrice ?? null, sellPrice:price, pnl, reason, buyDate:p.date, sellDate });
   save(STORE_HIST, history);
   positions.splice(settleIdx, 1);
   save(STORE_POS, positions);
@@ -591,7 +607,7 @@ function renderHistory() {
       <div>
         <div style="font-weight:700">${h.code} ${h.name||''}</div>
         <div class="meta">${h.buyDate} 買 → ${h.sellDate} 売 ／ ${h.reason} ／ ${h.qty}株</div>
-        <div class="meta">買値 ${h.buyPrice.toLocaleString()}円 → 売値 ${h.sellPrice.toLocaleString()}円</div>
+        <div class="meta">単価（予定）${h.buyPrice.toLocaleString()}円 / 単価（実施）${h.actualPrice != null ? h.actualPrice.toLocaleString()+'円' : '未入力'} → 売値 ${h.sellPrice.toLocaleString()}円</div>
       </div>
       <div class="history-pnl ${h.pnl>=0?'pnl pos':'pnl neg'}">${fmt(h.pnl)}</div>
     </div>
