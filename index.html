@@ -429,10 +429,11 @@ function updateField(idx, field, val) {
   const v = parseFloat(val);
   if (!isNaN(v) && v > 0) {
     positions[idx][field] = v;
-    // 買値変更時に逆指値・利確も再計算
-    if (field === 'buyPrice') {
-      positions[idx].stopLoss = Math.floor(v * 0.98);
-      positions[idx].takeProfit = Math.ceil(v * 1.20);
+    // 実施単価が更新されたら逆指値・利確を再計算（実施優先）
+    if (field === 'actualPrice' || field === 'buyPrice') {
+      const base = positions[idx].actualPrice || positions[idx].buyPrice;
+      positions[idx].stopLoss = Math.floor(base * 0.98);
+      positions[idx].takeProfit = Math.ceil(base * 1.20);
     }
     save(STORE_POS, positions);
     renderPositions();
