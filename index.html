@@ -499,7 +499,7 @@ function addPosition() {
   const date = document.getElementById('f-date').value;
   if (!code || !buy || !qty || !date) { alert('銘柄コード・買値・株数・購入日は必須です'); return; }
 
-  const stop = parseFloat(document.getElementById('f-stop').value) || Math.floor(buy*0.97);
+  const stop = parseFloat(document.getElementById('f-stop').value) || Math.floor(buy*0.98);
   const tp   = parseFloat(document.getElementById('f-tp').value)   || Math.ceil(buy*1.15);
   const name = document.getElementById('f-name').value.trim() || STOCKS[code] || '';
 
