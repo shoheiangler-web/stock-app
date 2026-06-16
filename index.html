@@ -134,8 +134,8 @@
     <thead>
       <tr>
         <th>銘柄</th>
-        <th>買い付け金額（予定）</th>
-        <th>買い付け金額（実施）</th>
+        <th>単価（予定）</th>
+        <th>単価（実施）</th>
         <th>株数</th>
         <th>逆指値 / 利確</th>
         <th>残り日数</th>
@@ -186,36 +186,32 @@
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>買値（円）</label>
+        <label>買い付け単価（予定）</label>
         <input id="f-buy" type="number" placeholder="例: 3500" oninput="onBuyInput()">
       </div>
+      <div class="form-group">
+        <label>買い付け単価（実施）</label>
+        <input id="f-actual" type="number" placeholder="約定後に入力">
+      </div>
+    </div>
+    <div class="form-row">
       <div class="form-group">
         <label>株数</label>
         <input id="f-qty" type="number" placeholder="例: 85">
       </div>
-    </div>
-    <div class="form-group">
-      <label>購入日</label>
-      <input id="f-date" type="date">
+      <div class="form-group">
+        <label>購入日</label>
+        <input id="f-date" type="date">
+      </div>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>逆指値（円）← 買値×0.98</label>
+        <label>逆指値（円）← 実施×0.98</label>
         <input id="f-stop" type="number" placeholder="自動計算">
       </div>
       <div class="form-group">
-        <label>利確価格（円）← 買値×1.20</label>
+        <label>利確価格（円）← 実施×1.20</label>
         <input id="f-tp" type="number" placeholder="自動計算">
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>買い付け金額（予定）</label>
-        <input id="f-planned" type="number" placeholder="自動計算" readonly style="opacity:0.5;cursor:default">
-      </div>
-      <div class="form-group">
-        <label>買い付け金額（実施）</label>
-        <input id="f-actual" type="number" placeholder="約定後に入力">
       </div>
     </div>
     <div class="modal-actions">
@@ -393,22 +389,19 @@ function renderPositions() {
 
   let totalCost = 0;
   tbody.innerHTML = positions.map((p, i) => {
-    const cost = p.actualCost != null ? p.actualCost : p.buyPrice * p.qty;
+    const cost = (p.actualPrice != null ? p.actualPrice : p.buyPrice) * p.qty;
     totalCost += cost;
     const elapsed = countBusinessDaysElapsed(p.date);
     const remaining = 20 - elapsed;
     let badgeClass = remaining <= 3 ? 'urgent' : remaining <= 7 ? 'warning' : 'ok';
     const deadlineStr = addBusinessDays(p.date, 20).toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'});
 
-    const plannedCost = p.buyPrice * p.qty;
-    const actualCost = p.actualCost != null ? p.actualCost : null;
-
     return `<tr>
       <td><div class="ticker">${p.code}<span>${p.name||''}</span></div></td>
-      <td style="color:#94a3b8;font-size:13px">${fmtY(plannedCost)}</td>
+      <td style="color:#94a3b8;font-size:13px">${p.buyPrice.toLocaleString()}円</td>
       <td>
-        <input class="inline-input" type="number" value="${actualCost != null ? actualCost : ''}" step="1"
-          placeholder="未入力" onchange="updateField(${i},'actualCost',this.value)">
+        <input class="inline-input" type="number" value="${p.actualPrice != null ? p.actualPrice : ''}" step="1"
+          placeholder="未入力" onchange="updateField(${i},'actualPrice',this.value)">
       </td>
       <td>${p.qty}株</td>
       <td style="font-size:12px;color:#64748b">
@@ -490,23 +483,20 @@ function openAddModal() {
 function closeAddModal() {
   document.getElementById('add-modal').classList.remove('open');
   document.getElementById('suggest-list').style.display = 'none';
-  ['f-code','f-name','f-buy','f-qty','f-stop','f-tp','f-planned','f-actual'].forEach(id => document.getElementById(id).value='');
-}
-function updatePlanned() {
-  const v = parseFloat(document.getElementById('f-buy').value);
-  const q = parseInt(document.getElementById('f-qty').value) || 0;
-  document.getElementById('f-planned').value = (v && q) ? Math.round(v * q) : '';
+  ['f-code','f-name','f-buy','f-actual','f-qty','f-stop','f-tp'].forEach(id => document.getElementById(id).value='');
 }
 function onBuyInput() {
-  const v = parseFloat(document.getElementById('f-buy').value);
-  if (v) {
-    document.getElementById('f-stop').value = Math.floor(v * 0.98);
-    document.getElementById('f-tp').value = Math.ceil(v * 1.20);
+  // 逆指値・利確は実施単価を優先、なければ予定単価で計算
+  const planned = parseFloat(document.getElementById('f-buy').value);
+  const actual  = parseFloat(document.getElementById('f-actual').value);
+  const base = actual || planned;
+  if (base) {
+    document.getElementById('f-stop').value = Math.floor(base * 0.98);
+    document.getElementById('f-tp').value   = Math.ceil(base * 1.20);
   }
-  updatePlanned();
 }
 document.addEventListener('input', e => {
-  if (e.target.id === 'f-qty') updatePlanned();
+  if (e.target.id === 'f-actual') onBuyInput();
 });
 
 // サジェスト外クリックで閉じる
@@ -523,13 +513,14 @@ function addPosition() {
   const date = document.getElementById('f-date').value;
   if (!code || !buy || !qty || !date) { alert('銘柄コード・買値・株数・購入日は必須です'); return; }
 
-  const stop   = parseFloat(document.getElementById('f-stop').value)   || Math.floor(buy*0.98);
-  const tp     = parseFloat(document.getElementById('f-tp').value)     || Math.ceil(buy*1.20);
-  const actual = parseFloat(document.getElementById('f-actual').value) || null;
-  const name   = document.getElementById('f-name').value.trim() || STOCKS[code] || '';
+  const actualPrice = parseFloat(document.getElementById('f-actual').value) || null;
+  const base = actualPrice || buy;
+  const stop = parseFloat(document.getElementById('f-stop').value) || Math.floor(base * 0.98);
+  const tp   = parseFloat(document.getElementById('f-tp').value)   || Math.ceil(base * 1.20);
+  const name = document.getElementById('f-name').value.trim() || STOCKS[code] || '';
 
   const positions = load(STORE_POS);
-  positions.push({ code, name, buyPrice:buy, qty, date, stopLoss:stop, takeProfit:tp, actualCost:actual });
+  positions.push({ code, name, buyPrice:buy, qty, date, stopLoss:stop, takeProfit:tp, actualPrice });
   save(STORE_POS, positions);
   closeAddModal();
   renderPositions();
