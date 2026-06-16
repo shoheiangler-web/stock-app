@@ -16,16 +16,14 @@
   nav button.active { background: #3b82f6; color: white; }
   nav button:hover:not(.active) { background: #334155; color: #e2e8f0; }
 
-  .page { display: none; padding: 20px; max-width: 900px; margin: 0 auto; }
+  .page { display: none; padding: 20px; max-width: 960px; margin: 0 auto; }
   .page.active { display: block; }
 
   /* サマリーカード */
-  .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
   .card { background: #1e293b; border-radius: 12px; padding: 16px; border: 1px solid #334155; }
   .card .label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
   .card .value { font-size: 22px; font-weight: 700; }
-  .card .value.pos { color: #34d399; }
-  .card .value.neg { color: #f87171; }
   .card .value.neutral { color: #e2e8f0; }
 
   /* ポジションテーブル */
@@ -37,14 +35,11 @@
 
   table { width: 100%; border-collapse: collapse; }
   th { text-align: left; padding: 10px 12px; font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #334155; }
-  td { padding: 14px 12px; border-bottom: 1px solid #1e293b; font-size: 14px; vertical-align: middle; }
+  td { padding: 12px; border-bottom: 1px solid #1e293b; font-size: 14px; vertical-align: middle; }
   tr:hover td { background: #1e293b; }
 
   .ticker { font-weight: 700; font-size: 15px; color: #f1f5f9; }
   .ticker span { display: block; font-size: 11px; font-weight: 400; color: #64748b; margin-top: 2px; }
-
-  .pnl.pos { color: #34d399; font-weight: 600; }
-  .pnl.neg { color: #f87171; font-weight: 600; }
 
   /* 残り日数バッジ */
   .days-badge { display: inline-block; padding: 3px 8px; border-radius: 20px; font-size: 12px; font-weight: 600; }
@@ -53,15 +48,16 @@
   .days-badge.ok { background: #14532d; color: #86efac; }
 
   /* アクションボタン */
-  .btn-sm { padding: 5px 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; }
-  .btn-close { background: #334155; color: #94a3b8; }
-  .btn-close:hover { background: #475569; color: #e2e8f0; }
+  .btn-sm { padding: 5px 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; margin-left: 4px; }
   .btn-settle { background: #064e3b; color: #34d399; }
   .btn-settle:hover { background: #065f46; }
+  .btn-delete { background: #450a0a; color: #f87171; }
+  .btn-delete:hover { background: #7f1d1d; }
 
-  /* 現在値入力 */
-  .price-input { background: #0f172a; border: 1px solid #334155; color: #e2e8f0; padding: 5px 8px; border-radius: 6px; font-size: 13px; width: 90px; text-align: right; }
-  .price-input:focus { outline: none; border-color: #3b82f6; }
+  /* インライン編集入力 */
+  .inline-input { background: #0f172a; border: 1px solid #334155; color: #e2e8f0; padding: 5px 8px; border-radius: 6px; font-size: 13px; width: 100px; text-align: right; }
+  .inline-input:focus { outline: none; border-color: #3b82f6; }
+  .inline-input::-webkit-inner-spin-button { opacity: 1; }
 
   /* モーダル */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
@@ -69,10 +65,11 @@
   .modal { background: #1e293b; border-radius: 16px; padding: 24px; width: 100%; max-width: 420px; border: 1px solid #334155; }
   .modal h2 { font-size: 16px; font-weight: 700; margin-bottom: 20px; }
 
-  .form-group { margin-bottom: 16px; }
+  .form-group { margin-bottom: 16px; position: relative; }
   label { display: block; font-size: 12px; color: #64748b; margin-bottom: 6px; font-weight: 500; }
   input, select { width: 100%; background: #0f172a; border: 1px solid #334155; color: #e2e8f0; padding: 10px 12px; border-radius: 8px; font-size: 14px; }
   input:focus, select:focus { outline: none; border-color: #3b82f6; }
+  input[type=number]::-webkit-inner-spin-button { opacity: 1; }
 
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
@@ -81,6 +78,13 @@
   .btn-primary:hover { background: #2563eb; }
   .btn-cancel { flex: 1; background: #334155; color: #94a3b8; border: none; padding: 11px; border-radius: 8px; cursor: pointer; font-size: 14px; }
   .btn-cancel:hover { background: #475569; }
+
+  /* 銘柄サジェスト */
+  .suggest-list { position: absolute; top: 100%; left: 0; right: 0; background: #1e293b; border: 1px solid #3b82f6; border-radius: 8px; z-index: 300; max-height: 180px; overflow-y: auto; }
+  .suggest-item { padding: 9px 12px; cursor: pointer; font-size: 13px; display: flex; gap: 10px; align-items: center; }
+  .suggest-item:hover { background: #334155; }
+  .suggest-item .code { font-weight: 700; color: #93c5fd; min-width: 44px; }
+  .suggest-item .name { color: #e2e8f0; }
 
   /* 決済モーダル */
   .settle-info { background: #0f172a; border-radius: 8px; padding: 12px; margin-bottom: 16px; font-size: 13px; line-height: 1.8; }
@@ -91,6 +95,8 @@
   .history-item { background: #1e293b; border-radius: 10px; padding: 14px 16px; border: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
   .history-item .meta { font-size: 12px; color: #64748b; margin-top: 4px; }
   .history-pnl { font-size: 18px; font-weight: 700; }
+  .pnl.pos { color: #34d399; }
+  .pnl.neg { color: #f87171; }
 
   .empty-state { text-align: center; padding: 60px 20px; color: #475569; }
   .empty-state p { margin-top: 8px; font-size: 14px; }
@@ -101,8 +107,8 @@
 <header>
   <h1>📈 株管理</h1>
   <nav>
-    <button class="active" onclick="showPage('positions')">保有</button>
-    <button onclick="showPage('history')">履歴</button>
+    <button class="active" onclick="showPage('positions', this)">保有</button>
+    <button onclick="showPage('history', this)">履歴</button>
   </nav>
 </header>
 
@@ -110,11 +116,7 @@
 <div id="page-positions" class="page active">
   <div class="summary-grid">
     <div class="card">
-      <div class="label">含み損益</div>
-      <div class="value" id="summary-pnl">¥0</div>
-    </div>
-    <div class="card">
-      <div class="label">投資額</div>
+      <div class="label">投資額合計</div>
       <div class="value neutral" id="summary-cost">¥0</div>
     </div>
     <div class="card">
@@ -132,10 +134,8 @@
     <thead>
       <tr>
         <th>銘柄</th>
+        <th>買い付け金額</th>
         <th>株数</th>
-        <th>買値</th>
-        <th>現在値</th>
-        <th>損益</th>
         <th>逆指値 / 利確</th>
         <th>残り日数</th>
         <th></th>
@@ -157,12 +157,8 @@
       <div class="value" id="hist-total">¥0</div>
     </div>
     <div class="card">
-      <div class="label">トレード数</div>
+      <div class="label">トレード数 / 勝率</div>
       <div class="value neutral" id="hist-count">0件</div>
-    </div>
-    <div class="card">
-      <div class="label">勝率</div>
-      <div class="value neutral" id="hist-winrate">-</div>
     </div>
   </div>
   <div id="history-list" class="history-list"></div>
@@ -179,17 +175,18 @@
     <div class="form-row">
       <div class="form-group">
         <label>銘柄コード</label>
-        <input id="f-code" type="text" placeholder="例: 7203" maxlength="5">
+        <input id="f-code" type="text" placeholder="例: 7203" maxlength="5" autocomplete="off" oninput="onCodeInput(this)">
+        <div id="suggest-list" class="suggest-list" style="display:none"></div>
       </div>
       <div class="form-group">
-        <label>銘柄名（任意）</label>
-        <input id="f-name" type="text" placeholder="例: トヨタ">
+        <label>銘柄名</label>
+        <input id="f-name" type="text" placeholder="自動入力">
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
         <label>買値（円）</label>
-        <input id="f-buy" type="number" placeholder="例: 3500">
+        <input id="f-buy" type="number" placeholder="例: 3500" oninput="onBuyInput()">
       </div>
       <div class="form-group">
         <label>株数</label>
@@ -202,11 +199,11 @@
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>逆指値（円） ← 買値×0.97</label>
+        <label>逆指値（円）← 買値×0.97</label>
         <input id="f-stop" type="number" placeholder="自動計算">
       </div>
       <div class="form-group">
-        <label>利確価格（円） ← 買値×1.15</label>
+        <label>利確価格（円）← 買値×1.15</label>
         <input id="f-tp" type="number" placeholder="自動計算">
       </div>
     </div>
@@ -243,73 +240,128 @@
 </div>
 
 <script>
+// ===== 日経225 銘柄辞書 =====
+const STOCKS = {
+  "1332":"ニッスイ","1333":"マルハニチロ","1605":"INPEX","1721":"コムシスHD","1801":"大成建設",
+  "1802":"大林組","1803":"清水建設","1812":"鹿島建設","1925":"大和ハウス","1928":"積水ハウス",
+  "2002":"日清製粉G","2269":"明治HD","2282":"日本ハム","2413":"エムスリー","2432":"ディー・エヌ・エー",
+  "2501":"サッポロHD","2502":"アサヒグループHD","2503":"キリンHD","2531":"宝HD","2768":"双日",
+  "2801":"キッコーマン","2802":"味の素","2871":"ニチレイ","2914":"JT","3086":"J.フロント リテイリング",
+  "3099":"三越伊勢丹HD","3382":"セブン&アイHD","3401":"帝人","3402":"東レ","3407":"旭化成",
+  "3436":"SUMCO","3659":"ネクソン","3861":"王子HD","3863":"日本製紙","3893":"紀洋紙業",
+  "4004":"レゾナック・HD","4005":"住友化学","4021":"日産化学","4042":"東ソー","4043":"トクヤマ",
+  "4061":"デンカ","4063":"信越化学工業","4151":"協和キリン","4183":"三井化学","4188":"三菱ケミカルG",
+  "4202":"ダイセル","4204":"積水化学工業","4208":"UBE","4307":"野村総合研究所","4324":"電通グループ",
+  "4452":"花王","4502":"武田薬品工業","4503":"アステラス製薬","4506":"住友ファーマ","4507":"塩野義製薬",
+  "4519":"中外製薬","4523":"エーザイ","4527":"ロート製薬","4543":"テルモ","4568":"第一三共",
+  "4578":"大塚HD","4631":"DIC","4642":"オリコン","4661":"オリエンタルランド","4689":"LINEヤフー",
+  "4704":"トレンドマイクロ","4751":"サイバーエージェント","4755":"楽天グループ","4901":"富士フイルムHD",
+  "4902":"コニカミノルタ","4911":"資生堂","5019":"出光興産","5020":"ENEOSホールディングス",
+  "5101":"横浜ゴム","5108":"ブリヂストン","5110":"住友ゴム工業","5201":"AGC","5202":"日本板硝子",
+  "5214":"日本電気硝子","5232":"住友大阪セメント","5233":"太平洋セメント","5301":"東海カーボン",
+  "5332":"TOTO","5333":"日本ガイシ","5334":"日本特殊陶業","5401":"日本製鉄","5406":"神戸製鋼所",
+  "5411":"JFEホールディングス","5541":"大平洋金属","5631":"日本製鋼所","5706":"三菱マテリアル",
+  "5711":"三菱マテリアル","5713":"住友金属鉱山","5714":"DOWAホールディングス","5715":"古河機械金属",
+  "5801":"古河電気工業","5802":"住友電気工業","5803":"フジクラ","5901":"東洋製罐グループHD",
+  "6028":"テクノプロHD","6098":"リクルートHD","6103":"オークマ","6113":"アマダ","6178":"日本郵政",
+  "6201":"豊田自動織機","6273":"SMC","6301":"小松製作所","6302":"住友重機械工業","6305":"日立建機",
+  "6326":"クボタ","6361":"荏原製作所","6367":"ダイキン工業","6371":"椿本チエイン","6376":"日機装",
+  "6378":"木村化工機","6383":"倉敷機械","6406":"フジテック","6412":"平和","6417":"SANKYO",
+  "6471":"日本精工","6473":"ジェイテクト","6479":"ミネベアミツミ","6501":"日立製作所",
+  "6502":"東芝","6503":"三菱電機","6504":"富士電機","6506":"安川電機","6508":"明電舎",
+  "6526":"ソシオネクスト","6594":"日本電産","6645":"オムロン","6701":"NEC","6702":"富士通",
+  "6703":"沖電気工業","6724":"セイコーエプソン","6725":"松風","6752":"パナソニックHD",
+  "6753":"シャープ","6758":"ソニーグループ","6762":"TDK","6770":"アルプスアルパイン",
+  "6806":"ヒロセ電機","6807":"日本航空電子工業","6841":"横河電機","6857":"アドバンテスト",
+  "6902":"デンソー","6920":"レーザーテック","6952":"カシオ計算機","6954":"ファナック",
+  "6971":"京セラ","6981":"村田製作所","6988":"日東電工","7003":"三井E&S","7011":"三菱重工業",
+  "7012":"川崎重工業","7013":"IHI","7182":"ゆうちょ銀行","7186":"コンコルディアFG",
+  "7201":"日産自動車","7202":"いすゞ自動車","7203":"トヨタ自動車","7205":"日野自動車",
+  "7211":"三菱自動車工業","7261":"マツダ","7267":"本田技研工業","7269":"スズキ","7270":"SUBARU",
+  "7272":"ヤマハ発動機","7276":"小糸製作所","7731":"ニコン","7733":"オリンパス","7735":"SCREENホールディングス",
+  "7741":"HOYA","7751":"キヤノン","7752":"リコー","7762":"シチズン時計","7832":"バンダイナムコHD",
+  "7951":"ヤマハ","7974":"任天堂","8001":"伊藤忠商事","8002":"丸紅","8015":"豊田通商",
+  "8031":"三井物産","8035":"東京エレクトロン","8053":"住友商事","8058":"三菱商事","8233":"高島屋",
+  "8252":"丸井グループ","8267":"イオン","8303":"新生銀行","8304":"あおぞら銀行","8306":"三菱UFJ FG",
+  "8308":"りそなHD","8309":"三井住友トラストHD","8316":"三井住友FG","8331":"千葉銀行",
+  "8354":"ふくおかFG","8355":"静岡銀行","8411":"みずほFG","8473":"SBIホールディングス",
+  "8601":"大和証券グループ本社","8604":"野村ホールディングス","8630":"SOMPOホールディングス",
+  "8697":"日本取引所グループ","8750":"第一生命HD","8766":"東京海上HD","8795":"T&Dホールディングス",
+  "9001":"東武鉄道","9005":"東急","9007":"小田急電鉄","9008":"京王電鉄","9009":"京成電鉄",
+  "9020":"JR東日本","9021":"JR西日本","9022":"JR東海","9064":"ヤマトHD","9101":"日本郵船",
+  "9104":"商船三井","9107":"川崎汽船","9201":"日本航空","9202":"ANA HD","9301":"三菱倉庫",
+  "9302":"三井倉庫HD","9432":"NTT","9433":"KDDI","9434":"ソフトバンク","9501":"東京電力HD",
+  "9502":"中部電力","9503":"関西電力","9531":"東京ガス","9532":"大阪ガス","9602":"東宝",
+  "9613":"NTTデータグループ","9681":"東京ドーム","9735":"セコム","9766":"コナミグループ",
+  "9983":"ファーストリテイリング","9984":"ソフトバンクグループ"
+};
+
 // ===== データ管理 =====
 const STORE_POS = 'stock_positions';
 const STORE_HIST = 'stock_history';
-
 function load(key) { return JSON.parse(localStorage.getItem(key) || '[]'); }
 function save(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
 
 // ===== 営業日計算 =====
-// 2026年の日本の祝日（主要分）
-const HOLIDAYS_2026 = new Set([
-  '2026-01-01','2026-01-12','2026-02-11','2026-02-23','2026-03-20',
-  '2026-04-29','2026-05-03','2026-05-04','2026-05-05','2026-05-06',
-  '2026-07-20','2026-08-11','2026-09-21','2026-09-22','2026-09-23',
-  '2026-10-12','2026-11-03','2026-11-23','2026-12-23',
+const HOLIDAYS = new Set([
   '2025-01-01','2025-01-13','2025-02-11','2025-02-23','2025-02-24',
   '2025-03-20','2025-04-29','2025-05-03','2025-05-04','2025-05-05',
   '2025-07-21','2025-08-11','2025-09-15','2025-09-23','2025-10-13',
   '2025-11-03','2025-11-24','2025-12-23',
+  '2026-01-01','2026-01-12','2026-02-11','2026-02-23','2026-03-20',
+  '2026-04-29','2026-05-03','2026-05-04','2026-05-05','2026-05-06',
+  '2026-07-20','2026-08-11','2026-09-21','2026-09-22','2026-09-23',
+  '2026-10-12','2026-11-03','2026-11-23','2026-12-23',
 ]);
 
-function isBusinessDay(date) {
-  const d = new Date(date);
+function isBusinessDay(d) {
   const day = d.getDay();
   if (day === 0 || day === 6) return false;
-  const str = d.toISOString().slice(0, 10);
-  return !HOLIDAYS_2026.has(str);
+  return !HOLIDAYS.has(d.toISOString().slice(0,10));
 }
-
 function addBusinessDays(dateStr, n) {
   let d = new Date(dateStr);
   let count = 0;
-  while (count < n) {
-    d.setDate(d.getDate() + 1);
-    if (isBusinessDay(d)) count++;
-  }
+  while (count < n) { d.setDate(d.getDate()+1); if (isBusinessDay(d)) count++; }
   return d;
 }
-
 function countBusinessDaysElapsed(fromStr) {
-  const from = new Date(fromStr);
-  const today = new Date();
-  today.setHours(0,0,0,0);
+  let d = new Date(fromStr);
+  const today = new Date(); today.setHours(0,0,0,0);
   let count = 0;
-  let d = new Date(from);
-  d.setDate(d.getDate() + 1);
-  while (d <= today) {
-    if (isBusinessDay(d)) count++;
-    d.setDate(d.getDate() + 1);
-  }
+  d.setDate(d.getDate()+1);
+  while (d <= today) { if (isBusinessDay(d)) count++; d.setDate(d.getDate()+1); }
   return count;
 }
 
-// ===== UI =====
-function showPage(name) {
+// ===== ユーティリティ =====
+function fmt(n) { return (n>=0?'+':'')+n.toLocaleString('ja-JP')+'円'; }
+function fmtY(n) { return '¥'+Math.round(n).toLocaleString('ja-JP'); }
+
+// ===== スクロール（ホイール）で数値増減 =====
+function addWheelToInputs() {
+  document.querySelectorAll('input[type=number]').forEach(el => {
+    el.removeEventListener('wheel', wheelHandler);
+    el.addEventListener('wheel', wheelHandler, {passive:false});
+  });
+}
+function wheelHandler(e) {
+  e.preventDefault();
+  const step = parseFloat(this.step) || 1;
+  const val = parseFloat(this.value) || 0;
+  this.value = e.deltaY < 0 ? val + step : Math.max(0, val - step);
+  this.dispatchEvent(new Event('input'));
+}
+
+// ===== ページ切り替え =====
+function showPage(name, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  event.target.classList.add('active');
+  document.getElementById('page-'+name).classList.add('active');
+  btn.classList.add('active');
   if (name === 'positions') renderPositions();
   if (name === 'history') renderHistory();
 }
-
-function fmt(n) {
-  const sign = n >= 0 ? '+' : '';
-  return sign + n.toLocaleString('ja-JP') + '円';
-}
-function fmtPrice(n) { return n.toLocaleString('ja-JP') + '円'; }
 
 // ===== ポジション描画 =====
 function renderPositions() {
@@ -320,107 +372,138 @@ function renderPositions() {
   if (positions.length === 0) {
     tbody.innerHTML = '';
     empty.style.display = 'block';
-    document.getElementById('summary-pnl').textContent = '¥0';
-    document.getElementById('summary-pnl').className = 'value neutral';
     document.getElementById('summary-cost').textContent = '¥0';
     document.getElementById('summary-count').textContent = '0銘柄';
     return;
   }
   empty.style.display = 'none';
 
-  let totalPnl = 0, totalCost = 0;
-
+  let totalCost = 0;
   tbody.innerHTML = positions.map((p, i) => {
-    const current = p.currentPrice || p.buyPrice;
-    const pnl = (current - p.buyPrice) * p.qty;
-    const pnlPct = ((current - p.buyPrice) / p.buyPrice * 100).toFixed(2);
-    totalPnl += pnl;
-    totalCost += p.buyPrice * p.qty;
-
+    const cost = p.buyPrice * p.qty;
+    totalCost += cost;
     const elapsed = countBusinessDaysElapsed(p.date);
     const remaining = 15 - elapsed;
-    let badgeClass = 'ok';
-    if (remaining <= 3) badgeClass = 'urgent';
-    else if (remaining <= 7) badgeClass = 'warning';
-
-    const pnlClass = pnl >= 0 ? 'pos' : 'neg';
-    const deadlineDate = addBusinessDays(p.date, 15);
-    const deadlineStr = deadlineDate.toLocaleDateString('ja-JP', {month:'numeric',day:'numeric'});
+    let badgeClass = remaining <= 3 ? 'urgent' : remaining <= 7 ? 'warning' : 'ok';
+    const deadlineStr = addBusinessDays(p.date, 15).toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'});
 
     return `<tr>
-      <td><div class="ticker">${p.code}<span>${p.name || ''}</span></div></td>
+      <td><div class="ticker">${p.code}<span>${p.name||''}</span></div></td>
+      <td>
+        <input class="inline-input" type="number" value="${p.buyPrice}" step="1"
+          onchange="updateField(${i},'buyPrice',this.value)"
+          oninput="updateField(${i},'buyPrice',this.value)">
+      </td>
       <td>${p.qty}株</td>
-      <td>${fmtPrice(p.buyPrice)}</td>
-      <td>
-        <input class="price-input" type="number" value="${current}"
-          onchange="updatePrice(${i}, this.value)" onblur="updatePrice(${i}, this.value)">
-      </td>
-      <td><span class="pnl ${pnlClass}">${fmt(Math.round(pnl))}<br><small>${pnlPct}%</small></span></td>
       <td style="font-size:12px;color:#64748b">
-        ▼ ${fmtPrice(p.stopLoss)}<br>
-        ▲ ${fmtPrice(p.takeProfit)}
+        ▼ ${p.stopLoss.toLocaleString()}円<br>
+        ▲ ${p.takeProfit.toLocaleString()}円
       </td>
       <td>
-        <span class="days-badge ${badgeClass}">${remaining > 0 ? remaining + '日' : '期限！'}</span>
+        <span class="days-badge ${badgeClass}">${remaining>0?remaining+'日':'期限！'}</span>
         <div style="font-size:10px;color:#64748b;margin-top:4px">${deadlineStr}まで</div>
       </td>
-      <td>
+      <td style="white-space:nowrap">
         <button class="btn-sm btn-settle" onclick="openSettleModal(${i})">決済</button>
+        <button class="btn-sm btn-delete" onclick="deletePosition(${i})">削除</button>
       </td>
     </tr>`;
   }).join('');
 
-  const pnlEl = document.getElementById('summary-pnl');
-  pnlEl.textContent = (totalPnl >= 0 ? '+¥' : '-¥') + Math.abs(Math.round(totalPnl)).toLocaleString();
-  pnlEl.className = 'value ' + (totalPnl >= 0 ? 'pos' : 'neg');
-  document.getElementById('summary-cost').textContent = '¥' + Math.round(totalCost).toLocaleString();
-  document.getElementById('summary-count').textContent = positions.length + '銘柄';
+  document.getElementById('summary-cost').textContent = fmtY(totalCost);
+  document.getElementById('summary-count').textContent = positions.length+'銘柄';
+  addWheelToInputs();
 }
 
-function updatePrice(idx, val) {
+function updateField(idx, field, val) {
   const positions = load(STORE_POS);
-  positions[idx].currentPrice = parseFloat(val) || positions[idx].buyPrice;
+  const v = parseFloat(val);
+  if (!isNaN(v) && v > 0) {
+    positions[idx][field] = v;
+    // 買値変更時に逆指値・利確も再計算
+    if (field === 'buyPrice') {
+      positions[idx].stopLoss = Math.floor(v * 0.97);
+      positions[idx].takeProfit = Math.ceil(v * 1.15);
+    }
+    save(STORE_POS, positions);
+    renderPositions();
+  }
+}
+
+function deletePosition(idx) {
+  const positions = load(STORE_POS);
+  const p = positions[idx];
+  if (!confirm(`${p.code} ${p.name||''} を削除しますか？\n（履歴には残りません）`)) return;
+  positions.splice(idx, 1);
   save(STORE_POS, positions);
   renderPositions();
+}
+
+// ===== 銘柄サジェスト =====
+function onCodeInput(el) {
+  const q = el.value.trim();
+  const list = document.getElementById('suggest-list');
+  if (!q) { list.style.display='none'; return; }
+
+  const matches = Object.entries(STOCKS).filter(([code, name]) =>
+    code.startsWith(q) || name.includes(q)
+  ).slice(0, 8);
+
+  if (matches.length === 0) { list.style.display='none'; return; }
+
+  list.innerHTML = matches.map(([code, name]) =>
+    `<div class="suggest-item" onclick="selectStock('${code}','${name}')">
+      <span class="code">${code}</span><span class="name">${name}</span>
+    </div>`
+  ).join('');
+  list.style.display = 'block';
+}
+
+function selectStock(code, name) {
+  document.getElementById('f-code').value = code;
+  document.getElementById('f-name').value = name;
+  document.getElementById('suggest-list').style.display = 'none';
 }
 
 // ===== 追加モーダル =====
 function openAddModal() {
   document.getElementById('f-date').value = new Date().toISOString().slice(0,10);
   document.getElementById('add-modal').classList.add('open');
-  // 買値変更時に自動計算
-  document.getElementById('f-buy').oninput = function() {
-    const v = parseFloat(this.value);
-    if (v) {
-      document.getElementById('f-stop').value = Math.floor(v * 0.97);
-      document.getElementById('f-tp').value = Math.ceil(v * 1.15);
-    }
-  };
+  setTimeout(() => { document.getElementById('f-code').focus(); addWheelToInputs(); }, 50);
 }
-function closeAddModal() { document.getElementById('add-modal').classList.remove('open'); clearForm(); }
+function closeAddModal() {
+  document.getElementById('add-modal').classList.remove('open');
+  document.getElementById('suggest-list').style.display = 'none';
+  ['f-code','f-name','f-buy','f-qty','f-stop','f-tp'].forEach(id => document.getElementById(id).value='');
+}
+function onBuyInput() {
+  const v = parseFloat(document.getElementById('f-buy').value);
+  if (v) {
+    document.getElementById('f-stop').value = Math.floor(v * 0.97);
+    document.getElementById('f-tp').value = Math.ceil(v * 1.15);
+  }
+}
 
-function clearForm() {
-  ['f-code','f-name','f-buy','f-qty','f-stop','f-tp'].forEach(id => document.getElementById(id).value = '');
-}
+// サジェスト外クリックで閉じる
+document.addEventListener('click', e => {
+  if (!e.target.closest('#suggest-list') && !e.target.closest('#f-code')) {
+    document.getElementById('suggest-list').style.display = 'none';
+  }
+});
 
 function addPosition() {
   const code = document.getElementById('f-code').value.trim();
-  const buy = parseFloat(document.getElementById('f-buy').value);
-  const qty = parseInt(document.getElementById('f-qty').value);
+  const buy  = parseFloat(document.getElementById('f-buy').value);
+  const qty  = parseInt(document.getElementById('f-qty').value);
   const date = document.getElementById('f-date').value;
-
   if (!code || !buy || !qty || !date) { alert('銘柄コード・買値・株数・購入日は必須です'); return; }
 
-  const stop = parseFloat(document.getElementById('f-stop').value) || Math.floor(buy * 0.97);
-  const tp = parseFloat(document.getElementById('f-tp').value) || Math.ceil(buy * 1.15);
+  const stop = parseFloat(document.getElementById('f-stop').value) || Math.floor(buy*0.97);
+  const tp   = parseFloat(document.getElementById('f-tp').value)   || Math.ceil(buy*1.15);
+  const name = document.getElementById('f-name').value.trim() || STOCKS[code] || '';
 
   const positions = load(STORE_POS);
-  positions.push({
-    code, name: document.getElementById('f-name').value.trim(),
-    buyPrice: buy, qty, date,
-    stopLoss: stop, takeProfit: tp,
-    currentPrice: buy,
-  });
+  positions.push({ code, name, buyPrice:buy, qty, date, stopLoss:stop, takeProfit:tp });
   save(STORE_POS, positions);
   closeAddModal();
   renderPositions();
@@ -431,19 +514,17 @@ let settleIdx = null;
 function openSettleModal(idx) {
   settleIdx = idx;
   const p = load(STORE_POS)[idx];
-  const current = p.currentPrice || p.buyPrice;
-  const estPnl = Math.round((current - p.buyPrice) * p.qty);
   document.getElementById('settle-info').innerHTML = `
-    <div class="row"><span>銘柄</span><span>${p.code} ${p.name || ''}</span></div>
+    <div class="row"><span>銘柄</span><span>${p.code} ${p.name||''}</span></div>
     <div class="row"><span>株数</span><span>${p.qty}株</span></div>
-    <div class="row"><span>買値</span><span>${fmtPrice(p.buyPrice)}</span></div>
-    <div class="row"><span>現在値（参考）</span><span>${fmtPrice(current)}</span></div>
-    <div class="row"><span>概算損益</span><span style="color:${estPnl>=0?'#34d399':'#f87171'}">${fmt(estPnl)}</span></div>
+    <div class="row"><span>買値</span><span>${p.buyPrice.toLocaleString()}円</span></div>
+    <div class="row"><span>買い付け金額</span><span>${fmtY(p.buyPrice*p.qty)}</span></div>
   `;
-  document.getElementById('s-price').value = current;
+  document.getElementById('s-price').value = p.buyPrice;
   document.getElementById('settle-modal').classList.add('open');
+  setTimeout(addWheelToInputs, 50);
 }
-function closeSettleModal() { document.getElementById('settle-modal').classList.remove('open'); settleIdx = null; }
+function closeSettleModal() { document.getElementById('settle-modal').classList.remove('open'); settleIdx=null; }
 
 function confirmSettle() {
   const price = parseFloat(document.getElementById('s-price').value);
@@ -455,15 +536,8 @@ function confirmSettle() {
   const pnl = Math.round((price - p.buyPrice) * p.qty);
 
   const history = load(STORE_HIST);
-  history.unshift({
-    code: p.code, name: p.name, qty: p.qty,
-    buyPrice: p.buyPrice, sellPrice: price,
-    pnl, reason,
-    buyDate: p.date,
-    sellDate: new Date().toISOString().slice(0,10),
-  });
+  history.unshift({ code:p.code, name:p.name, qty:p.qty, buyPrice:p.buyPrice, sellPrice:price, pnl, reason, buyDate:p.date, sellDate:new Date().toISOString().slice(0,10) });
   save(STORE_HIST, history);
-
   positions.splice(settleIdx, 1);
   save(STORE_POS, positions);
   closeSettleModal();
@@ -477,34 +551,31 @@ function renderHistory() {
   const empty = document.getElementById('history-empty');
 
   if (history.length === 0) {
-    list.innerHTML = '';
-    empty.style.display = 'block';
-    document.getElementById('hist-total').textContent = '¥0';
-    document.getElementById('hist-total').className = 'value neutral';
-    document.getElementById('hist-count').textContent = '0件';
-    document.getElementById('hist-winrate').textContent = '-';
+    list.innerHTML=''; empty.style.display='block';
+    document.getElementById('hist-total').textContent='¥0';
+    document.getElementById('hist-total').className='value neutral';
+    document.getElementById('hist-count').textContent='0件';
     return;
   }
-  empty.style.display = 'none';
+  empty.style.display='none';
 
-  const total = history.reduce((s, h) => s + h.pnl, 0);
-  const wins = history.filter(h => h.pnl > 0).length;
-  const winrate = Math.round(wins / history.length * 100);
+  const total = history.reduce((s,h)=>s+h.pnl, 0);
+  const wins = history.filter(h=>h.pnl>0).length;
+  const winrate = Math.round(wins/history.length*100);
 
   const totalEl = document.getElementById('hist-total');
-  totalEl.textContent = (total >= 0 ? '+¥' : '-¥') + Math.abs(total).toLocaleString();
-  totalEl.className = 'value ' + (total >= 0 ? 'pos' : 'neg');
-  document.getElementById('hist-count').textContent = history.length + '件';
-  document.getElementById('hist-winrate').textContent = winrate + '%';
+  totalEl.textContent = (total>=0?'+¥':'-¥')+Math.abs(total).toLocaleString();
+  totalEl.className = 'value '+(total>=0?'pnl pos':'pnl neg');
+  document.getElementById('hist-count').textContent = `${history.length}件 / 勝率${winrate}%`;
 
   list.innerHTML = history.map(h => `
     <div class="history-item">
       <div>
-        <div style="font-weight:700">${h.code} ${h.name || ''}</div>
-        <div class="meta">${h.buyDate} 買 → ${h.sellDate} 売 / ${h.reason} / ${h.qty}株</div>
-        <div class="meta">買値 ${fmtPrice(h.buyPrice)} → 売値 ${fmtPrice(h.sellPrice)}</div>
+        <div style="font-weight:700">${h.code} ${h.name||''}</div>
+        <div class="meta">${h.buyDate} 買 → ${h.sellDate} 売 ／ ${h.reason} ／ ${h.qty}株</div>
+        <div class="meta">買値 ${h.buyPrice.toLocaleString()}円 → 売値 ${h.sellPrice.toLocaleString()}円</div>
       </div>
-      <div class="history-pnl ${h.pnl >= 0 ? 'pnl pos' : 'pnl neg'}">${fmt(h.pnl)}</div>
+      <div class="history-pnl ${h.pnl>=0?'pnl pos':'pnl neg'}">${fmt(h.pnl)}</div>
     </div>
   `).join('');
 }
